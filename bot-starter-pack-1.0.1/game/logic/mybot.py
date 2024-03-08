@@ -100,8 +100,33 @@ def go_button(board: Board):
             x_button = g.position.x
     return y_button, x_button
 
+def check_enemy(board: Board, board_bot: GameObject):
+    n = 0
+    for g in board.game_objects :
+        if (g.properties.name != board_bot.properties.name and g.type == "BotGameObject"):
+            n += 1
+    return n
+
+def get_nearest_enemy(board_bot: GameObject, board: Board):
+    if check_enemy(board) > 0:
+        res_y = -1
+        res_x = -1
+        time = 0
+        min = 30
+        carry = 0
+        for g in board.game_objects :
+            if (g.properties.name != board_bot.properties.name and g.type == "BotGameObject"):
+                delta = abs(g.position.y - board_bot.position.y) + abs(g.position.x - board_bot.position.x)
+                if delta < min:
+                    min = delta
+                    res_y = g.position.y
+                    res_x = g.position.x
+                    time = g.properties.milliseconds_left
+                    carry = g.properties.diamonds
+        return res_y, res_x, min, time, carry
+
 class MyBot(BaseLogic):    
-    def __init__(self):
+    def init(self):
         # Initialize attributes necessary
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
@@ -110,7 +135,6 @@ class MyBot(BaseLogic):
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
         time = math.floor(board_bot.properties.milliseconds_left / 1000)
-        print(time)
         y_button, x_button = go_button(board)
         if check_blue(board) + check_red(board) < 17 and (abs(board_bot.position.y - y_button) + abs(board_bot.position.x - x_button)) < 5 and props.diamonds < 4:
             y, x = go_button(board)
@@ -122,11 +146,44 @@ class MyBot(BaseLogic):
                 target = [base.y, base.x]
                 self.goal_position = target
             else:
-                if props.diamonds < 4:
-                    if go_home(board_bot) > time - 3 and props.diamonds > 0:
+                if props.diamonds == 3 or props.diamonds == 2:
+                    if go_home(board_bot) == time - 3 :
                         base = board_bot.properties.base
                         target = [base.y, base.x]
                         self.goal_position = target
+                    elif go_home(board_bot) > time - 5:
+                        res_y, res_x, min, time, carry = get_nearest_enemy(board_bot, board)
+                        if carry > 0 and min == 1 and board_bot.properties.milliseconds_left - time > 0:
+                            target = [int(res_y), int(res_x)]
+                            self.goal_position = target
+                    else : 
+                        if check_red(board) > 0 and check_blue(board) > 0 :
+                            y_blue, x_blue, min_blue = get_nearest_blue(board_bot, board)
+                            y_red, x_red, min_red = get_nearest_red(board_bot, board)
+                            if min_blue*2 < min_red :
+                                target = [int(y_blue), int(x_blue)]
+                                self.goal_position = target
+                            else :
+                                target = [int(y_red), int(x_red)]
+                                self.goal_position = target
+                        if check_red(board) > 0 and check_blue(board) == 0 :
+                            y_red, x_red, min_red = get_nearest_red(board_bot, board)
+                            target = [int(y_red), int(x_red)]
+                            self.goal_position = target
+                        if check_red(board) == 0 and check_blue(board) > 0 :
+                            y_blue, x_blue, min_blue = get_nearest_blue(board_bot, board)
+                            target = [int(y_blue), int(x_blue)]
+                            self.goal_position = target
+                elif props.diamonds == 1 or props.diamonds == 0:
+                    if go_home(board_bot) == time - 3:
+                        base = board_bot.properties.base
+                        target = [base.y, base.x]
+                        self.goal_position = target
+                    elif go_home(board_bot) > time - 5:
+                        res_y, res_x, min, time, carry = get_nearest_enemy(board_bot, board)
+                        if carry > 0 and min == 1 and board_bot.properties.milliseconds_left - time > 0:
+                            target = [int(res_y), int(res_x)]
+                            self.goal_position = target
                     else : 
                         if check_red(board) > 0 and check_blue(board) > 0 :
                             y_blue, x_blue, min_blue = get_nearest_blue(board_bot, board)
@@ -145,12 +202,16 @@ class MyBot(BaseLogic):
                             y_blue, x_blue, min_blue = get_nearest_blue(board_bot, board)
                             target = [int(y_blue), int(x_blue)]
                             self.goal_position = target 
-
-                if props.diamonds == 4 :
-                    if go_home(board_bot) > time - 3 and props.diamonds > 0:
+                elif props.diamonds == 4 :
+                    if go_home(board_bot) == time - 3:
                         base = board_bot.properties.base
                         target = [base.y, base.x]
                         self.goal_position = target
+                    elif go_home(board_bot) > time - 5:
+                        res_y, res_x, min, time, carry = get_nearest_enemy(board_bot, board)
+                        if carry > 0 and min == 1 and board_bot.properties.milliseconds_left - time > 0:
+                            target = [int(res_y), int(res_x)]
+                            self.goal_position = target
                     else : 
                         y_blue, x_blue, min_blue = get_nearest_blue(board_bot, board)
                         if check_blue(board) > 0:
