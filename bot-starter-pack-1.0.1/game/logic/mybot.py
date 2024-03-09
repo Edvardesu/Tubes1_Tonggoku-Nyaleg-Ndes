@@ -122,6 +122,57 @@ def threesteps (board_bot:GameObject, board:Board): # cari apakah ada diamond da
                 return ytemp,xtemp
     return ytemp,xtemp
 
+def check_portal_and_base_align(board_bot: GameObject, board: Board): 
+    # menghindari portal saat ada portal yang segaris dengan home base (di koordinat y yang sama atau x yang sama)
+    # akan terjadi jika self goal position = base
+    # jika portal berada di tengah (bot - portal - base) atau (base - bot - portal)
+    # self goal position = base
+    check = False
+    base_x = board_bot.properties.base.x
+    base_y = board_bot.properties.base.y
+    portal_y0 = board.game_objects[0].position.y
+    portal_y1 = board.game_objects[1].position.y
+    portal_x0 = board.game_objects[0].position.x
+    portal_x1 = board.game_objects[1].position.x
+    if ((board_bot.goal_position.y == base_y)):
+        if ((board_bot.position.y == base_y) and (board_bot.position.y == portal_y0)):
+            if (board_bot.position.y < portal_y0 < base_y):
+                check = True
+            elif (board_bot.position.y > portal_y1 > base_y):
+                check =  True
+        elif ((board_bot.position.y == base_y) and (board_bot.position.y == portal_y1)):
+            if (board_bot.position.y < portal_y0 < base_y):
+                check = True
+            elif (board_bot.position.y > portal_y1 > base_y):
+                check = True
+    if ((board_bot.goal_position.x == base_x)):
+        if ((board_bot.position.x == base_x) and (board_bot.position.x == portal_x0)):
+            if (board_bot.position.x < portal_x0 < base_x):
+                check = True
+            elif (board_bot.position.x > portal_x1 > base_x):
+                check = True
+        elif ((board_bot.position.x == base_x) and (board_bot.position.x == portal_x1)):
+            if (board_bot.position.x < portal_x0 < base_x):
+                check = True
+            elif (board_bot.position.x > portal_x1 > base_x):
+                check = True
+    return check
+
+def evade_portal(board_bot: GameObject, board: Board):
+    res_y = board_bot.position.y
+    res_x = board_bot.position.x
+    if (check_portal_and_base_align(board_bot, board)):
+        if (board_bot.position.y == 14):
+            res_y -= 1
+        elif (board_bot.position.y == 0):
+            res_y += 1
+        elif (board_bot.position.x == 14):
+            res_x -= 1
+        elif (board_bot.position.x == 0):
+            res_x += 1
+    return res_y, res_x
+
+
 class MyBot(BaseLogic):    
     def __init__(self):
         # Initialize attributes necessary
