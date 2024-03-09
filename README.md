@@ -1,6 +1,6 @@
 # **Tubes 1 Strategi Algoritma : Diamonds**
 Repositori ini mengandung program untuk sebuah bot untuk permainan Diamonds
-sebagai Tugas besar 1 mata kuliah Strategi dan Algoritma 2024.
+sebagai Tugas Besar 1 mata kuliah Strategi dan Algoritma 2024.
 
 ## Authors
 **Kelompok Tonggoku Nyaleg Ndes**
@@ -10,7 +10,7 @@ sebagai Tugas besar 1 mata kuliah Strategi dan Algoritma 2024.
 | Zachary Samuel Tobing | 13522016 |
 | Dimas Bagoes Hendrianto | 13522112 |
 
-##** Latar Belakang**
+## **Latar Belakang**
 Diamonds merupakan suatu _programming challenge_ yang mempertandingkan bot yang
 anda buat dengan bot dari para pemain lainnya. Setiap pemain akan memiliki sebuah bot
 dimana tujuan dari bot ini adalah mengumpulkan diamond sebanyak-banyaknya. Cara
