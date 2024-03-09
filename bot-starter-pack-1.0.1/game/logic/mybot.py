@@ -125,6 +125,29 @@ def get_nearest_enemy(board_bot: GameObject, board: Board):
                     carry = g.properties.diamonds
         return res_y, res_x, min, time, carry
 
+def threesteps (board_bot:GameObject, board:Board): # cari apakah ada diamond dalam 3 langkah dari bot
+    min = 4 # tidak ada dalam 3 langkah dari posisi bot
+    xtemp = 0 # untuk tampung nilai dengan jarak terkecil
+    ytemp = 0 # untuk tampung nilai dengan jarak terkecil
+    base = board_bot.properties.base
+    for d in board.diamonds:
+        if d.properties.points == 1 or d.properties.points == 2:
+            jarakx = abs(d.position.x - board_bot.position.x)
+            jaraky = abs(d.position.y - board_bot.position.y)
+            if jarakx + jaraky < min: # dalam tigalangkah
+                xtemp = d.position.x
+                ytemp = d.position.y
+            elif jarakx + jaraky == min: # sama dengan minimum
+                tempbasedistance = abs(xtemp-base.x) + abs(ytemp-base.y)
+                currentbasedistance = abs(d.position.x-base.x) + abs(d.position.y-base.y)
+                if currentbasedistance <= tempbasedistance:
+                    xtemp = d.position.x
+                    ytemp = d.position.y
+            elif jarakx + jaraky == 1: # hanya beda 1 kotak sudah pasti minimum
+                return ytemp,xtemp
+    print(ytemp,xtemp)
+    return ytemp,xtemp
+
 class MyBot(BaseLogic):    
     def init(self):
         # Initialize attributes necessary
